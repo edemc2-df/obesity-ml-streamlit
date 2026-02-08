@@ -55,6 +55,29 @@ data = pd.DataFrame([{
     "bmi": float(bmi)
 }])
 
+FEATURE_ORDER = [
+    "gender","age","height","weight","family_history","favc","fcvc","ncp","caec",
+    "smoke","ch2o","scc","faf","tue","calc","mtrans","bmi"
+]
+
+# garante a mesma ordem do treino
+data = data[FEATURE_ORDER]
+
+# ajuda a validar que o peso está sendo considerado
+st.caption(f"BMI calculado: {bmi:.2f}")
+st.caption(f"Peso: {weight} kg | Altura: {height} cm")
+
+
 if st.button("Prever"):
     pred = model.predict(data)[0]
     st.success(f"Predição do modelo: **{pred}**")
+
+    # Mostrar probabilidades (se disponível)
+    if hasattr(model, "predict_proba"):
+        proba = model.predict_proba(data)[0]
+        classes = model.classes_
+        df_proba = pd.DataFrame({"classe": classes, "probabilidade": proba}) \
+                    .sort_values("probabilidade", ascending=False)
+        st.write("Probabilidades por classe:")
+        st.dataframe(df_proba, use_container_width=True)
+
